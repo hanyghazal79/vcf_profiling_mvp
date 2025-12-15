@@ -1,0 +1,95 @@
+{
+  "patient_id": "P001",
+  "analysis_date": "2025-12-15T19:38:24.513846",
+  "overall_risk": "High Risk",
+  "variant_count": 3,
+  "pathogenic_count": 2,
+  "vus_count": 1,
+  "variants": [
+    {
+      "chromosome": "17",
+      "position": 43091995,
+      "ref": "AG",
+      "alt": "A",
+      "gene": "BRCA1",
+      "rsid": "rs80357914",
+      "consequence": "BRCA1",
+      "clinvar_significance": "Pathogenic",
+      "gnomad_af": 0.001,
+      "classification": "pathogenic",
+      "risk_level": "High Risk"
+    },
+    {
+      "chromosome": "13",
+      "position": 32913838,
+      "ref": "T",
+      "alt": "-",
+      "gene": "BRCA2",
+      "rsid": "rs80359600",
+      "consequence": "BRCA2",
+      "clinvar_significance": "Pathogenic",
+      "gnomad_af": 0.001,
+      "classification": "pathogenic",
+      "risk_level": "High Risk"
+    },
+    {
+      "chromosome": "16",
+      "position": 23646201,
+      "ref": "C",
+      "alt": "T",
+      "gene": "PALB2",
+      "rsid": "rs180177143",
+      "consequence": "PALB2",
+      "clinvar_significance": "Uncertain_significance",
+      "gnomad_af": 0.001,
+      "classification": "unknown",
+      "risk_level": "Variant of Uncertain Significance"
+    }
+  ],
+  "summary": {
+    "high_risk_genes": [
+      "BRCA1",
+      "BRCA2"
+    ],
+    "genes_with_variants": [
+      "PALB2",
+      "BRCA1",
+      "BRCA2"
+    ],
+    "total_genes_analyzed": 10,
+    "risk_interpretation": "Detected 2 pathogenic variant(s) in gene(s): BRCA1, BRCA2. This indicates increased hereditary breast cancer risk.",
+    "clinical_implications": [
+      "High lifetime risk of breast cancer (45-85%)",
+      "Increased risk of ovarian cancer",
+      "Consider enhanced screening with MRI",
+      "Referral to genetic counseling recommended"
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "recommendation": "Referral to genetic counseling",
+      "rationale": "Pathogenic variant(s) detected"
+    },
+    {
+      "priority": "high",
+      "recommendation": "Enhanced breast screening",
+      "rationale": "Increased breast cancer risk"
+    }
+  ],
+  "plots": {
+    "risk_distribution": {
+      "High Risk": 2,
+      "VUS": 1,
+      "Low Risk": 0
+    },
+    "gene_distribution": {
+      "BRCA1": 1,
+      "BRCA2": 1,
+      "PALB2": 1
+    },
+    "variant_types": {
+      "Other": 3
+    }
+  }
+}

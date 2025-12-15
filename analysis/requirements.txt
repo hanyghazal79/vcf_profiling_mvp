@@ -1,0 +1,22 @@
+# Core dependencies
+
+# Data processing
+pandas
+numpy
+
+# Visualization
+plotly
+matplotlib
+seaborn
+
+# Web framework (for API mode)
+fastapi
+uvicorn
+python-multipart
+
+# Optional: For real VCF parsing
+cyvcf2
+requests
+# Development
+pytest
+black

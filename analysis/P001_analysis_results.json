@@ -1,0 +1,81 @@
+{
+  "patient_id": "P001",
+  "analysis_date": "2025-12-12T02:40:07.703005",
+  "overall_risk": "Variant of Uncertain Significance",
+  "variant_count": 3,
+  "pathogenic_count": 0,
+  "vus_count": 3,
+  "variants": [
+    {
+      "chromosome": "17",
+      "position": 43091995,
+      "ref": "AG",
+      "alt": "A",
+      "gene": "BRCA1",
+      "rsid": "rs80357914",
+      "consequence": "BRCA1",
+      "gnomad_af": null,
+      "clinvar_significance": "Uncertain_significance",
+      "classification": "unknown",
+      "risk_level": "Variant of Uncertain Significance"
+    },
+    {
+      "chromosome": "13",
+      "position": 32913838,
+      "ref": "T",
+      "alt": "-",
+      "gene": "BRCA2",
+      "rsid": "rs80359600",
+      "consequence": "BRCA2",
+      "gnomad_af": null,
+      "clinvar_significance": "Uncertain_significance",
+      "classification": "unknown",
+      "risk_level": "Variant of Uncertain Significance"
+    },
+    {
+      "chromosome": "16",
+      "position": 23646201,
+      "ref": "C",
+      "alt": "T",
+      "gene": "PALB2",
+      "rsid": "rs180177143",
+      "consequence": "PALB2",
+      "gnomad_af": null,
+      "clinvar_significance": "Uncertain_significance",
+      "classification": "unknown",
+      "risk_level": "Variant of Uncertain Significance"
+    }
+  ],
+  "summary": {
+    "risk_interpretation": "Detected 3 variant(s) of uncertain significance (VUS). Genetic counseling recommended.",
+    "clinical_implications": [
+      "Continue age-appropriate screening"
+    ],
+    "high_risk_genes": [],
+    "genes_with_variants": [
+      "PALB2",
+      "BRCA1",
+      "BRCA2"
+    ],
+    "total_genes_analyzed": 10
+  },
+  "recommendations": [
+    {
+      "priority": "medium",
+      "recommendation": "Genetic counseling for VUS interpretation",
+      "rationale": "Variant of uncertain significance detected"
+    }
+  ],
+  "plots": {
+    "risk_distribution": {
+      "High Risk": 0,
+      "VUS": 3,
+      "Low Risk": 0
+    },
+    "gene_distribution": {
+      "BRCA1": 1,
+      "BRCA2": 1,
+      "PALB2": 1
+    }
+  }
+}

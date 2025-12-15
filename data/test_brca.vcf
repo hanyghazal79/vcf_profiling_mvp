@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+##source=TestSequencer
+##reference=GRCh37
+##INFO=<ID=CSQ,Number=.,Type=String,Description="Consequence">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+17	43091995	rs80357914	AG	A	100	PASS	CSQ=frameshift_variant|BRCA1
+13	32913838	rs80359600	T	-	100	PASS	CSQ=frameshift_variant|BRCA2
+16	23646201	rs180177143	C	T	100	PASS	CSQ=missense_variant|PALB2
