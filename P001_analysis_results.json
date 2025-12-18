@@ -1,6 +1,6 @@
 {
   "patient_id": "P001",
-  "analysis_date": "2025-12-15T19:38:24.513846",
+  "analysis_date": "2025-12-17T21:21:13.347861",
   "overall_risk": "High Risk",
   "variant_count": 3,
   "pathogenic_count": 2,
@@ -48,16 +48,16 @@
   ],
   "summary": {
     "high_risk_genes": [
-      "BRCA1",
-      "BRCA2"
+      "BRCA2",
+      "BRCA1"
     ],
     "genes_with_variants": [
+      "BRCA2",
       "PALB2",
-      "BRCA1",
-      "BRCA2"
+      "BRCA1"
     ],
     "total_genes_analyzed": 10,
-    "risk_interpretation": "Detected 2 pathogenic variant(s) in gene(s): BRCA1, BRCA2. This indicates increased hereditary breast cancer risk.",
+    "risk_interpretation": "Detected 2 pathogenic variant(s) in gene(s): BRCA2, BRCA1. This indicates increased hereditary breast cancer risk.",
     "clinical_implications": [
       "High lifetime risk of breast cancer (45-85%)",
       "Increased risk of ovarian cancer",
