@@ -13,6 +13,18 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 from enum import Enum
 
+# Check if running on PythonAnywhere
+if 'PYTHONANYWHERE_DOMAIN' in os.environ:
+    # Disable cyvcf2 import on PythonAnywhere (not available)
+    CYVCF2_AVAILABLE = False
+else:
+    try:
+        import cyvcf2
+        CYVCF2_AVAILABLE = True
+    except ImportError:
+        CYVCF2_AVAILABLE = False
+        print("Warning: cyvcf2 not available, using simple VCF parser")
+
 # Breast cancer genes with GRCh37 coordinates
 BREAST_CANCER_GENES = {
     'BRCA1': {'chr': '17', 'start': 43044295, 'end': 43125483},
@@ -111,8 +123,9 @@ class GeneticAnalyzer:
             # Return error results
             return self._generate_error_results(str(e))
     
+    # Update the _parse_vcf_simple method to be more robust
     def _parse_vcf_simple(self, vcf_path: str) -> List[GeneticVariant]:
-        """Parse VCF file without external dependencies"""
+        """Parse VCF file without external dependencies - PythonAnywhere compatible"""
         variants = []
         
         print(f"Parsing VCF: {vcf_path}")
@@ -120,96 +133,165 @@ class GeneticAnalyzer:
         if not os.path.exists(vcf_path):
             raise FileNotFoundError(f"VCF file not found: {vcf_path}")
         
-        with open(vcf_path, 'r') as f:
-            line_number = 0
-            in_header = True
-            column_indices = {}
+        # Check if file is gzipped
+        is_gzipped = vcf_path.lower().endswith('.gz')
+        
+        try:
+            if is_gzipped:
+                import gzip
+                opener = gzip.open
+                mode = 'rt'  # text mode for gzip
+            else:
+                opener = open
+                mode = 'r'
             
+            with opener(vcf_path, mode) as f:
+                line_number = 0
+                in_header = True
+                
+                for line in f:
+                    line_number += 1
+                    line = line.strip()
+                    
+                    if not line:
+                        continue
+                        
+                    # Skip comment lines but track header end
+                    if line.startswith('#'):
+                        if line.startswith('#CHROM'):
+                            in_header = False
+                            # Parse column headers
+                            columns = line[1:].strip().split('\t')
+                            if len(columns) < 8:
+                                print(f"Warning: VCF file has only {len(columns)} columns")
+                        continue
+                    
+                    # Data line
+                    if not in_header:
+                        parts = line.split('\t')
+                        
+                        if len(parts) < 5:
+                            print(f"Warning: Line {line_number} has only {len(parts)} columns, skipping")
+                            continue
+                        
+                        # Extract basic variant info
+                        chrom = parts[0].replace('chr', '').replace('Chr', '').replace('CHR', '')
+                        # Remove any additional chromosome markers
+                        chrom = chrom.split(':')[0] if ':' in chrom else chrom
+                        
+                        try:
+                            pos = int(parts[1])
+                        except ValueError:
+                            print(f"Warning: Invalid position at line {line_number}: {parts[1]}, skipping")
+                            continue
+                        
+                        variant_id = parts[2] if len(parts) > 2 else '.'
+                        ref = parts[3]
+                        alt = parts[4]
+                        
+                        # Split multiple ALTs if present
+                        alts = alt.split(',')
+                        
+                        for single_alt in alts:
+                            # Check if variant is in breast cancer genes
+                            gene = None
+                            for gene_name, coords in BREAST_CANCER_GENES.items():
+                                gene_chrom = coords['chr']
+                                if chrom == gene_chrom and coords['start'] <= pos <= coords['end']:
+                                    gene = gene_name
+                                    break
+                            
+                            if gene:
+                                # Parse INFO field if available
+                                consequence = None
+                                clinvar_sig = None
+                                af = None
+                                
+                                if len(parts) > 7:
+                                    info = parts[7]
+                                    # Look for consequence in INFO
+                                    for info_field in info.split(';'):
+                                        if '=' in info_field:
+                                            key, value = info_field.split('=', 1)
+                                            if key == 'CSQ' or key == 'Consequence':
+                                                consequence = value.split('|')[0] if '|' in value else value
+                                            elif key == 'CLNSIG' or 'clinvar' in key.lower():
+                                                clinvar_sig = value
+                                            elif key == 'AF' or key == 'gnomad_af':
+                                                try:
+                                                    af = float(value)
+                                                except:
+                                                    pass
+                                
+                                # Create variant object
+                                variant = GeneticVariant(
+                                    chromosome=chrom,
+                                    position=pos,
+                                    ref=ref,
+                                    alt=single_alt,
+                                    gene=gene,
+                                    rsid=variant_id if variant_id.startswith('rs') else None,
+                                    consequence=consequence or 'unknown',
+                                    clinvar_significance=clinvar_sig
+                                )
+                                
+                                # Store allele frequency
+                                if af is not None:
+                                    variant.gnomad_af = af
+                                
+                                variants.append(variant)
+                
+        except Exception as e:
+            print(f"Error parsing VCF file: {e}")
+            # Fallback to simple line-by-line reading
+            return self._parse_vcf_fallback(vcf_path)
+        
+        print(f"Total variants in breast cancer genes: {len(variants)}")
+        return variants
+
+    def _parse_vcf_fallback(self, vcf_path: str) -> List[GeneticVariant]:
+        """Fallback parser for malformed VCF files"""
+        variants = []
+        
+        with open(vcf_path, 'r', errors='ignore') as f:
             for line in f:
-                line_number += 1
                 line = line.strip()
-                
-                if not line:
-                    continue
-                    
-                # Header lines
-                if line.startswith('#'):
-                    if line.startswith('#CHROM'):
-                        in_header = False
-                        # Parse column headers
-                        columns = line[1:].strip().split('\t')  # Remove #
-                        for i, col in enumerate(columns):
-                            column_indices[col] = i
-                        print(f"Found columns: {columns}")
+                if not line or line.startswith('#'):
                     continue
                 
-                # Data line
-                if not in_header:
-                    parts = line.split('\t')
-                    
-                    if len(parts) < 8:
-                        print(f"Warning: Line {line_number} has only {len(parts)} columns")
-                        continue
-                    
-                    # Extract basic variant info
-                    chrom = parts[0].replace('chr', '').replace('Chr', '').replace('CHR', '')
-                    try:
-                        pos = int(parts[1])
-                    except:
-                        print(f"Warning: Invalid position at line {line_number}: {parts[1]}")
-                        continue
-                    
-                    variant_id = parts[2]
+                # Simple tab splitting
+                parts = line.split('\t')
+                if len(parts) < 5:
+                    continue
+                
+                try:
+                    chrom = parts[0]
+                    pos = int(parts[1])
                     ref = parts[3]
                     alt = parts[4]
-                    info = parts[7] if len(parts) > 7 else ''
                     
-                    # Check if variant is in breast cancer genes
+                    # Simple gene matching based on position ranges
                     gene = None
-                    for gene_name, coords in BREAST_CANCER_GENES.items():
-                        gene_chrom = coords['chr']
-                        if chrom == gene_chrom and coords['start'] <= pos <= coords['end']:
-                            gene = gene_name
-                            break
+                    if '17' in chrom and 43000000 <= pos <= 43130000:
+                        gene = 'BRCA1'
+                    elif '13' in chrom and 32880000 <= pos <= 32980000:
+                        gene = 'BRCA2'
+                    elif '16' in chrom and 23610000 <= pos <= 23660000:
+                        gene = 'PALB2'
                     
                     if gene:
-                        # Parse INFO field for consequence
-                        consequence = None
-                        if 'CSQ=' in info:
-                            csq_part = info.split('CSQ=')[1].split(';')[0]
-                            if '|' in csq_part:
-                                consequence = csq_part.split('|')[1]  # Consequence is usually second field
-                        
-                        # Parse AF if available
-                        af = None
-                        if 'AF=' in info:
-                            af_part = info.split('AF=')[1].split(';')[0]
-                            try:
-                                af = float(af_part)
-                            except:
-                                pass
-                        
-                        # Create variant object
                         variant = GeneticVariant(
                             chromosome=chrom,
                             position=pos,
                             ref=ref,
                             alt=alt,
                             gene=gene,
-                            rsid=variant_id if variant_id.startswith('rs') else None,
-                            consequence=consequence or 'unknown'
+                            consequence='unknown'
                         )
-                        
-                        # Store allele frequency
-                        if af is not None:
-                            variant.gnomad_af = af
-                        
                         variants.append(variant)
-                        
-                        if len(variants) % 100 == 0:
-                            print(f"  Found {len(variants)} variants in breast cancer genes...")
+                except:
+                    continue
         
-        print(f"Total variants in breast cancer genes: {len(variants)}")
         return variants
     
     def _classify_variants(self):
