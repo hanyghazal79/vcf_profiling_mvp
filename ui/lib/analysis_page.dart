@@ -23,7 +23,8 @@ class _AnalysisPageState extends State<AnalysisPage> {
   String _patientId = 'P001';
   // ignore: unused_field
   Map<String, dynamic>? _analysisResults;
-  String _apiUrl = 'http://127.0.0.1:8000'; // Change to your API URL
+  String _apiUrl =
+      'https://hanyghazal79.pythonanywhere.com'; // Change to your API URL
 
   // Text controllers
   final TextEditingController _patientIdController = TextEditingController();
