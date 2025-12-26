@@ -122,24 +122,55 @@ class _AnalysisPageState extends State<AnalysisPage> {
 
   Future<Map<String, dynamic>> _analyzeOnline() async {
     try {
-      // Read file
+      // Read file - handle potential large files
       File file = File(_selectedFilePath!);
-      String vcfContent = await file.readAsString();
 
-      // Validate VCF content
-      if (!vcfContent.contains('#CHROM')) {
-        throw Exception('Invalid VCF file format');
+      // Check file size (max 50MB for online analysis)
+      final fileSize = await file.length();
+      if (fileSize > 50 * 1024 * 1024) {
+        throw Exception('File too large for online analysis (max 50MB)');
       }
 
-      // Prepare multipart request
+      // Read file content
+      String vcfContent;
+      try {
+        vcfContent = await file.readAsString();
+      } catch (e) {
+        // Try reading as bytes and decoding
+        final bytes = await file.readAsBytes();
+        vcfContent = utf8.decode(bytes);
+      }
+
+      // Validate VCF content
+      if (!vcfContent.contains('#CHROM') &&
+          !vcfContent.contains('#fileformat=VCF')) {
+        // Check first few lines
+        final lines = vcfContent.split('\n').take(10).toList();
+        bool hasVcfHeader = false;
+        for (var line in lines) {
+          if (line.contains('#CHROM') || line.contains('#fileformat=VCF')) {
+            hasVcfHeader = true;
+            break;
+          }
+        }
+
+        if (!hasVcfHeader) {
+          throw Exception(
+            'Invalid VCF file format. File should contain VCF headers.',
+          );
+        }
+      }
+
+      // Prepare multipart request with timeout
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$_apiUrl/api/analyze'),
+        Uri.parse('$_apiUrl/api/analyze-direct'), // Use direct endpoint
       );
 
       request.fields['patient_id'] = _patientId;
       request.fields['mode'] = 'online';
 
+      // FIXED: Use the correct way to create MultipartFile
       request.files.add(
         http.MultipartFile.fromString(
           'file',
@@ -148,22 +179,27 @@ class _AnalysisPageState extends State<AnalysisPage> {
         ),
       );
 
-      // Send request
-      var response = await request.send();
+      // Send request with timeout
+      var response = await request.send().timeout(Duration(seconds: 120));
 
       if (response.statusCode == 200) {
         String responseBody = await response.stream.bytesToString();
         return json.decode(responseBody);
       } else {
+        String errorBody = await response.stream.bytesToString();
         throw Exception(
-          'API request failed with status: ${response.statusCode}',
+          'API request failed with status: ${response.statusCode}\n$errorBody',
         );
       }
     } catch (e) {
-      // If online fails, fall back to offline
+      // If online fails, fall back to offline with better error message
       if (kDebugMode) {
         print('Online analysis failed: $e');
       }
+
+      // Show user-friendly error
+      _showSnackBar('Online analysis failed. Trying offline mode...');
+
       return await _analyzeOffline();
     }
   }
