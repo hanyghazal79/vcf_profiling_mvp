@@ -31,14 +31,9 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc"
 )
-
-# Add PythonAnywhere specific paths
-if 'PYTHONANYWHERE_DOMAIN' in os.environ:
-    # PythonAnywhere specific configuration
-    BASE_DIR = '/home/hanyghazal79/vcf_profiling_mvp/analysis'
-    sys.path.insert(0, BASE_DIR)
-    
-    # Create necessary directories
+# Check if running on Replit
+if 'REPLIT_DB_URL' in os.environ or 'REPL_ID' in os.environ:
+    print("Running on Replit environment")
     os.makedirs('/tmp/vcf_uploads', exist_ok=True)
     os.makedirs('/tmp/results', exist_ok=True)
 
@@ -48,8 +43,10 @@ app.add_middleware(
     allow_origins=[
         "http://localhost",  # Local development
         "http://localhost:8080",  # Flutter web local
-        "https://transcendent-phoenix-7fc0c6.netlify.app",  # Your Netlify URL
+        "https://dulcet-fox-eb11d3.netlify.app",  # Your Netlify URL
         "https://*.netlify.app",  # All Netlify subdomains
+        "https://*.replit.dev",  # Add Replit domains
+        "https://*.repl.co",
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
