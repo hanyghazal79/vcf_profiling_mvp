@@ -742,12 +742,12 @@ async def shutdown_event():
     # Shutdown executor
     executor.shutdown(wait=True)
 
-# if __name__ == "__main__":
-#     # Run server
-#     uvicorn.run(
-#         "api_server:app",
-#         host="0.0.0.0",
-#         port=8000,
-#         reload=True,
-#         log_level="info"
-#     )
+if __name__ == "__main__":
+    # Run server
+    uvicorn.run(
+        "api_server:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )

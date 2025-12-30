@@ -1,6 +1,6 @@
 {
   "patient_id": "P001",
-  "analysis_date": "2025-12-17T21:21:13.347861",
+  "analysis_date": "2025-12-30T16:14:11.407788",
   "overall_risk": "High Risk",
   "variant_count": 3,
   "pathogenic_count": 2,
@@ -13,7 +13,7 @@
       "alt": "A",
       "gene": "BRCA1",
       "rsid": "rs80357914",
-      "consequence": "BRCA1",
+      "consequence": "frameshift_variant",
       "clinvar_significance": "Pathogenic",
       "gnomad_af": 0.001,
       "classification": "pathogenic",
@@ -26,7 +26,7 @@
       "alt": "-",
       "gene": "BRCA2",
       "rsid": "rs80359600",
-      "consequence": "BRCA2",
+      "consequence": "frameshift_variant",
       "clinvar_significance": "Pathogenic",
       "gnomad_af": 0.001,
       "classification": "pathogenic",
@@ -39,10 +39,10 @@
       "alt": "T",
       "gene": "PALB2",
       "rsid": "rs180177143",
-      "consequence": "PALB2",
+      "consequence": "missense_variant",
       "clinvar_significance": "Uncertain_significance",
       "gnomad_af": 0.001,
-      "classification": "unknown",
+      "classification": "uncertain",
       "risk_level": "Variant of Uncertain Significance"
     }
   ],
@@ -53,8 +53,8 @@
     ],
     "genes_with_variants": [
       "BRCA2",
-      "PALB2",
-      "BRCA1"
+      "BRCA1",
+      "PALB2"
     ],
     "total_genes_analyzed": 10,
     "risk_interpretation": "Detected 2 pathogenic variant(s) in gene(s): BRCA2, BRCA1. This indicates increased hereditary breast cancer risk.",
@@ -89,7 +89,8 @@
       "PALB2": 1
     },
     "variant_types": {
-      "Other": 3
+      "Frameshift": 2,
+      "Missense": 1
     }
   }
 }
