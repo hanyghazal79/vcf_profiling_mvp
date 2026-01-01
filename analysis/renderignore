@@ -1,0 +1,26 @@
+# [file name]: .renderignore
+# [file content begin]
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.ipynb_checkpoints
+.vscode
+.idea
+*.log
+test_files/
+sample_data/
+large_vcf_files/
+.DS_Store
+*.vcf
+*.vcf.gz
+tmp/
+!tmp/.gitkeep
+# [file content end]
