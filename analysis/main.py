@@ -48,17 +48,17 @@ async def lifespan(app: FastAPI):
     #     os.makedirs('reports', exist_ok=True)
     
     
-    if 'RENDER' in os.environ:
-        print("Running on Render environment")
-        base_dir = Path.cwd()
-    else:
-        print("Running in local/development environment")
-        base_dir = Path.cwd()
+    # if 'RENDER' in os.environ:
+    #     print("Running on Render environment")
+    #     base_dir = Path.cwd()
+    # else:
+    #     print("Running in local/development environment")
+    #     base_dir = Path.cwd()
 
-    # Create all required directories
-    for subdir in ['tmp/vcf_uploads', 'tmp/vcf_direct', 'tmp/test_vcf', 'tmp/results', 'reports']:
-        (base_dir / subdir).mkdir(parents=True, exist_ok=True)
-        print(f"Created directory: {base_dir / subdir}")
+    # # Create all required directories
+    # for subdir in ['tmp/vcf_uploads', 'tmp/vcf_direct', 'tmp/test_vcf', 'tmp/results', 'reports']:
+    #     (base_dir / subdir).mkdir(parents=True, exist_ok=True)
+    #     print(f"Created directory: {base_dir / subdir}")
     
     # Start cleanup task
     cleanup_task = asyncio.create_task(cleanup_old_jobs())
